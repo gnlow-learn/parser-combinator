@@ -33,11 +33,19 @@ const option =
 const p: Record<string, (result: string) => Parser<string>> = {
     upperChar: char("upper", char => "A" <= char && char <= "Z"),
     lowerChar: char("lower", char => "a" <= char && char <= "z"),
+    space: char("space", char => char == " "),
 }
 
-const anyChar = (result: string) => reduce(option)([
-    p.upperChar(result),
-    p.lowerChar(result),
-])
+const anyChar = (result: string) => reduce(option)(
+    Object.values(p).map(f => f(result))
+)
 
-console.log(bind(anyChar(""))(anyChar)("Ab"))
+const bindReduce =
+reduce(<A>
+    (f1: (a: A) => Parser<A>) =>
+    (f2: (a: A) => Parser<A>) =>
+    (a: A) =>
+    bind(f1(a))(f2)
+)
+
+console.log(bindReduce([anyChar, anyChar])("")("A "))
