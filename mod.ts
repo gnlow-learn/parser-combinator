@@ -34,6 +34,7 @@ const p: Record<string, (result: string) => Parser<string>> = {
     upperChar: char("upper", char => "A" <= char && char <= "Z"),
     lowerChar: char("lower", char => "a" <= char && char <= "z"),
     space: char("space", char => char == " "),
+    eof: result => ([char]) => char ? [] : [[result, ""]],
 }
 
 const anyChar = (result: string) => reduce(option)(
@@ -48,4 +49,4 @@ reduce(<A>
     bind(f1(a))(f2)
 )
 
-console.log(bindReduce([anyChar, anyChar])("")("A "))
+console.log(bindReduce(Array(3).fill(anyChar))("")("A "))
