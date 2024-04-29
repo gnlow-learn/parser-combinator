@@ -13,6 +13,14 @@ const char =
             ? [[`${result} ${type}(${head})`, tail.join("")]]
             : []
 
+const reduce =
+<A>
+(f: (a1: A) => (a2: A) => A) =>
+([head, ...rest]: A[]): A =>
+    rest.length
+        ? f(head)(reduce(f)(rest))
+        : head
+
 const option =
 <A>
 (p: Parser<A>) =>
@@ -27,6 +35,9 @@ const p: Record<string, (result: string) => Parser<string>> = {
     lowerChar: char("lower", char => "a" <= char && char <= "z"),
 }
 
-const anyChar = (result: string) => option(p.upperChar(result))(p.lowerChar(result))
+const anyChar = (result: string) => reduce(option)([
+    p.upperChar(result),
+    p.lowerChar(result),
+])
 
 console.log(bind(anyChar(""))(anyChar)("Ab"))
