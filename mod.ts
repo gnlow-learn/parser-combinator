@@ -38,7 +38,7 @@ const p: Record<string, (result: string) => Parser<string>> = {
 }
 
 const anyChar = (result: string) => reduce(option)(
-    Object.values(p).map(f => f(result))
+    Object.values(p).map(f => f(result)).toReversed()
 )
 
 const bindReduce =
@@ -49,4 +49,10 @@ reduce(<A>
     bind(f1(a))(f2)
 )
 
-console.log(bindReduce(Array(3).fill(anyChar))("")("A "))
+p.pascalId =
+result =>
+str =>
+    bindReduce([p.upperChar, p.lowerChar])(result)(str)
+    .map(([result, rest]) => [`pascal(${result})`, rest])
+
+console.log(bindReduce(Array(3).fill(anyChar))("")("Ab"))
